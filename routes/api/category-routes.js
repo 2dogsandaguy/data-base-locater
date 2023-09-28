@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoriesData = await Category.findAll();
-    res.status(200).json(categoriesData);
+    res.status(200).json({message: 'Categories retrieved successfully', data: categoriesData});
   } catch (err) {
     res.status(500).json(err);
   }
@@ -28,7 +28,7 @@ router.get('/:id',async (req, res) => {
       return;
     }
 
-    res.status(200).json(categoriesData);
+    res.status(200).json({message: 'Categories Id retrieved successfully', data: categoriesData});
   } catch (err) {
     res.status(500).json(err);
   }
@@ -38,7 +38,7 @@ router.post('/',async (req, res) => {
   // create a new category
       try {
       const categoriesData = await Category.create(req.body);
-      res.status(200).json(categoriesData);
+      res.status(200).json({message: 'Categories created successfully', data: categoriesData});
     } catch (err) {
       res.status(400).json(err);
     }

@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         {model: Product},
           ]
     });
-    res.status(200).json(tagData);
+    res.status(200).json({ message: 'Tags retrieved successfully', data: tagData });
   } catch (err) {
     res.status(400).json(err);
   }
@@ -31,7 +31,7 @@ router.get('/:id', async (req, res) => {
 
       }
     });
-    res.json(tagData);
+    res.status(200).json({ message: 'Tag retrieved successfully', data: tagData });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
     const TagData = await Tag.create({
       tag_name: req.body.tag_name,
     });
-    res.json(TagData);
+    res.status(200).json({ message: 'Tag created successfully', data: TagData });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -54,17 +54,27 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   // update a tag's name by its `id` value
   try {
-    const [rowsUpdated, [updatedTag]] = await Tag.update(req.body, {
+    const rowsUpdated = await Tag.update(req.body, {
       where: {
         id: req.params.id,
       },
-      returning: true, 
     });
-    if (!updatedTag) {
+  
+    if (rowsUpdated[0] === 0) {
       res.status(404).json({ message: 'No tag found with this id' });
       return;
     }
-    res.json(updatedTag);
+  
+    // Assuming rowsUpdated[0] is the number of updated rows
+    // Fetch the updated record separately
+    const updatedTag = await Tag.findByPk(req.params.id, {
+      include: {
+        model: Product,
+        attributes: ['product_name', 'price', 'stock', 'category_id'],
+      },
+    });
+  
+    res.status(200).json({ message: 'Tag updated successfully', data: updatedTag });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -83,7 +93,7 @@ router.delete('/:id', async (req, res) => {
       res.status(404).json({ message: 'No tag found with this id' });
       return;
     }
-    res.json(rowsDeleted);
+    res.status(200).json({ message: 'Tag deleted successfully', data: rowsDeleted });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
