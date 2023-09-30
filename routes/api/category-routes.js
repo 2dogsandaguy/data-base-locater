@@ -52,9 +52,19 @@ router.put('/:id',async (req, res) => {
         res.status(404).json({message: 'no categories found with this id!'});
         return;
   }
-  await categoriesToUpdate.update(req.body);
+// Check if req.body is empty or null
+if (!req.body || Object.keys(req.body).length === 0) {
+  res.status(400).json({ message: 'Request body is empty or null' });
+  return;
+}
 
+// Update the category only if req.body is not null
+await categoriesToUpdate.update(req.body);
+
+// Set the products if they are provided in req.body
+if (req.body.products) {
   await categoriesToUpdate.setProducts(req.body.products);
+}
 
   res.status(200).json({message: 'category updated successfully'});
 } catch (err) {
@@ -77,7 +87,7 @@ router.delete('/:id',async (req, res) => {
       return;
     }
 
-    res.status(200).json(categoriesData);
+    res.status(200).json({message: 'Category deleted successfully', data: categoriesData});
   } catch (err) {
     res.status(500).json(err);
   }

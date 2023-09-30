@@ -48,13 +48,23 @@ router.post('/', (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
-  Product.create(req.body)({
-    product_name: req.body.product_name,
-    price: req.body.price,
-    stock: req.body.stock,
-    category_id: req.body.category_id,
-    tagIds: req.body.tagIds
-    })
+    
+      // Check if the required fields are present in req.body
+      if (!req.body.product_name || !req.body.price || !req.body.stock || !req.body.category_id) {
+        res.status(400).json({ message: 'Missing required fields in request body' });
+        return;
+      }
+    
+      // Create the product
+      Product.create({
+        product_name: req.body.product_name,
+        price: req.body.price,
+        stock: req.body.stock,
+        category_id: req.body.category_id,
+        // Assuming tagIds is an array in req.body
+        // If it's not an array, you might need to handle it differently
+        tagIds: req.body.tagIds
+      })
 
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
